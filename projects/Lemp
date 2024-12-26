@@ -1,0 +1,87 @@
+LEMP PROJECT 
+Step No.1
+sudo apt install nginx php8.3-fpm matriadb-server -y
+cd /var/www/html
+
+Create HTML & PHP files
+form.html
+tt.php
+sudo apt install php-mysqlnd -y
+
+sudo mysql
+alter user 'root'@'localhost' identified by 'form@17'
+create database; form;
+use form;
+create table :
+create table users (id int not null auto_increment primary key, name varchar (30), email varchar (50), website varchar (20), comment varchar(50), gender varchar (10)); 
+
+Configuration changes in nginx
+cd /etc/nginx/sites-available/
+sudo nano default
+Remove 4 # from php location 
+-----------------------------------------------------------------------
+# Add index.php to the list if you are using PHP
+        index index.php index.html index.htm index.nginx-debian.html;
+
+        server_name _;
+
+        location / {
+                # First attempt to serve request as file, then
+                # as directory, then fall back to displaying a 404.
+                try_files $uri $uri/ =404;
+        }
+
+        # pass PHP scripts to FastCGI server
+        #
+        location ~ \.php$ {   
+                include snippets/fastcgi-php.conf;
+        #
+        #       # With php-fpm (or other unix sockets):
+                fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+        #       # With php-cgi (or other tcp sockets):
+        #       fastcgi_pass 127.0.0.1:9000;
+        } 
+------------------------------------------------------------------------
+sudo service nginx restart
+
+sudo mysql -u root -p 
+use mysql;
+SELECT host, user FROM user;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY 'form@123';
+FLUSH PRIVILEGES;
+
+------------------------------------------------------------------------------
+Add this information in tt.php
+<?php
+
+$name=$_POST["name"];
+$email=$_POST["email"];
+$website= $_POST["website"];
+$comment=$_POST["comment"];
+$gender=$_POST["gender"];
+echo $name;
+echo $email;
+echo $gender;
+echo $comment;
+echo $website;
+
+$servername = "your host";
+$username = "your user";        
+$password = "your password";    
+$dbname = "db name";
+
+// Create connection
+$conn = mysqli_connect($servername, $username, $password, $dbname);
+// Check connection
+if (!$conn) {
+  die("Connection failed: " . mysqli_connect_error());
+}
+$sql = "INSERT INTO users (name,email,website,comment,gender)VALUES('$name','$email','$website','$comment','$gender')";
+if (mysqli_query($conn, $sql)) {
+  echo "New record created successfully";
+} else {
+  echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+}
+mysqli_close($conn);
+?>
+
